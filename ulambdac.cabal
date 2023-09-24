@@ -1,0 +1,51 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           ulambdac
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/Luc-Saccoccio/ulambdac#readme>
+homepage:       https://github.com/Luc-Saccoccio/ulambdac#readme
+bug-reports:    https://github.com/Luc-Saccoccio/ulambdac/issues
+author:         Luc Saccoccio--Le Guennec
+maintainer:     lucsaccoccio@disroot.org
+copyright:      2023 Luc Saccoccio--Le Guennec
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/Luc-Saccoccio/ulambdac
+
+library
+  exposed-modules:
+      Parser
+      Eval
+  other-modules:
+      Paths_ulambdac
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , isocline
+    , megaparsec
+    , text
+  default-language: Haskell2010
+
+executable ulambdac-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_ulambdac
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , ulambdac
+  default-language: Haskell2010
