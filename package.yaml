@@ -31,12 +31,14 @@ ghc-options:
 library:
   source-dirs: src
   exposed-modules:
-      - Parser
       - Eval
+      - Def
+      - Parser
   dependencies:
-  - isocline
   - text
   - megaparsec
+  - unordered-containers
+  - hashable
 
 executables:
   ulambdac-exe:
@@ -48,3 +50,6 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - ulambdac
+    - isocline
+    - megaparsec
+

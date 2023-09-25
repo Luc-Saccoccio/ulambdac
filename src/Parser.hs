@@ -1,18 +1,11 @@
-module Parser (parseExpr, Identifier, LambdaTree(..)) where
+module Parser (parseExpr, parseCommand) where
 
-import           Data.Void                  (Void)
-import           Text.Megaparsec
-import           Text.Megaparsec.Char       hiding (space)
+import Def
+import Data.Functor (($>), (<&>))
+import Data.Void (Void)
+import Text.Megaparsec
+import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
-
-type Identifier = Char
-
-data LambdaTree
-  = App LambdaTree LambdaTree
-  | Lambda Identifier LambdaTree
-  | Variable Identifier
-  | Alias Identifier LambdaTree
-  -- deriving Show
 
 
 type Parser = Parsec Void String
@@ -47,12 +40,45 @@ alias = Alias <$> (aliasIdentifier <* keyword ":=") <*> expression
 application :: Parser LambdaTree
 application = term >>= rest
   where
-    rest x = do { y <- term
-                ; rest (App x y)
-                } <|> return x
+    rest x =
+      do
+        y <- term
+        rest (App x y)
+        <|> return x
 
 term :: Parser LambdaTree
 term = alias <|> lambdaAbs <|> var <|> between (char '(') (char ')') application
 
+filepath :: Parser FilePath
+filepath = undefined
+
+metaCommand :: String -> String -> Parser ()
+metaCommand start end = string start *> optional (string end) *> space
+
+-- The parser for command feels very clumsy
+command :: Parser Command
+command =
+  (load <|> edit <|> reload <|> quit) <|> (lambda <*> (skipMany spaceChar *> expression))
+  where
+    load = metaCommand ":l" "oad" *> some filepath <&> Load
+    edit = metaCommand ":e" "dit" *> filepath <&> Edit
+    reload = metaCommand ":r" "eload" $> Reload
+    quit = metaCommand ":q" "uit" $> Quit
+    subterms = metaCommand ":s" "ubterms" $> Subterms
+    redexes = keyword ":x" $> Redexes
+    fv = keyword ":fv" $> FV
+    autoreduc = keyword ":ar" $> AutoReduc
+    manualreduc = keyword ":mr" $> ManReduc
+    lambda =
+      subterms
+        <|> redexes
+        <|> fv
+        <|> autoreduc
+        <|> manualreduc
+        <|> return None
+
 parseExpr :: String -> String -> Either (ParseErrorBundle String Void) LambdaTree
 parseExpr = parse (skipMany spaceChar *> expression <* eof)
+
+parseCommand :: String -> String -> Either (ParseErrorBundle String Void) Command
+parseCommand = parse (skipMany spaceChar *> lexeme command <* eof)

@@ -14,13 +14,14 @@ This implementation follows Barendregt's convention, that is :
 
 ## TODO
 
-- [ ] Subterms
+- [x] Subterms
 - [ ] Free Variables
 - [ ] Redexes
 - [ ] Substitution
 - [ ] β-reduction
 - [ ] Automatic reduction
 - [ ] Manual reduction
+- [ ] REPL history
 
 ## References
 
