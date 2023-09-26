@@ -2,6 +2,20 @@
 
 The Untyped Lambda Calculus REPL (Acronym In Progress)
 
+## Grammar
+
+```
+expr ::= application | term
+term ::= alias | lambdaAbs | var | '(' application ')'
+alias ::= ALIASIDENTIFIER ":=" expr
+lambdaAbs ::= ('\' | 'λ') VARIABLEIDENTIFIER '.' application
+var ::= ALIASIDENTIFIER | VARIABLEIDENTIFIER
+application ::= term term+
+
+ALIASIDENTIFIER ::= _any single upper case letter_
+VARIABLEIDENTIFIER ::= _any single lower case letter_
+```
+
 ## Usage notes
 
 This implementation follows Barendregt's convention, that is :

@@ -58,7 +58,7 @@ metaCommand start end = string start *> optional (string end) *> space
 -- The parser for command feels very clumsy
 command :: Parser Command
 command =
-  (load <|> edit <|> reload <|> quit) <|> (lambda <*> (skipMany spaceChar *> expression))
+  (eof $> Quit) <|> ((load <|> edit <|> reload <|> quit) <|> (lambda <*> (skipMany spaceChar *> expression))) <* eof
   where
     load = metaCommand ":l" "oad" *> some filepath <&> Load
     edit = metaCommand ":e" "dit" *> filepath <&> Edit
@@ -81,4 +81,4 @@ parseExpr :: String -> String -> Either (ParseErrorBundle String Void) LambdaTre
 parseExpr = parse (skipMany spaceChar *> expression <* eof)
 
 parseCommand :: String -> String -> Either (ParseErrorBundle String Void) Command
-parseCommand = parse (skipMany spaceChar *> lexeme command <* eof)
+parseCommand = parse (skipMany spaceChar *> lexeme command)
