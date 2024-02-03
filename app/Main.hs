@@ -8,6 +8,9 @@ import System.Console.Isocline
 import System.Exit
 import Text.Megaparsec
 
+helpMsg :: String
+helpMsg = "TODO"
+
 eval :: Bool -> String -> IO ()
 eval b s = case parseCommand "repl" s of
   Left  e -> putStrLn $ errorBundlePretty e
@@ -21,6 +24,7 @@ eval b s = case parseCommand "repl" s of
     Load      f -> putStrLn $ "Load " ++ show f
     Reload      -> putStrLn "Reload"
     Quit        -> exitSuccess
+    Help        -> putStrLn helpMsg
     Edit f      -> putStrLn $ "Edit " ++ show f
 
 main :: IO ()

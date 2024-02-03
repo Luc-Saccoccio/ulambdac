@@ -58,17 +58,18 @@ metaCommand start end = string start *> optional (string end) *> space
 -- The parser for command feels very clumsy
 command :: Parser Command
 command =
-  (eof $> Quit) <|> ((load <|> edit <|> reload <|> quit) <|> (lambda <*> (skipMany spaceChar *> expression))) <* eof
+  (eof $> Quit) <|> ((load <|> edit <|> reload <|> quit <|> help) <|> (lambda <*> (skipMany spaceChar *> expression))) <* eof
   where
     load = metaCommand ":l" "oad" *> some filepath <&> Load
     edit = metaCommand ":e" "dit" *> filepath <&> Edit
     reload = metaCommand ":r" "eload" $> Reload
     quit = metaCommand ":q" "uit" $> Quit
-    subterms = metaCommand ":s" "ubterms" $> Subterms
-    redexes = keyword ":x" $> Redexes
-    fv = keyword ":fv" $> FV
-    autoreduc = keyword ":ar" $> AutoReduc
-    manualreduc = keyword ":mr" $> ManReduc
+    help = metaCommand ":h" "elp" $> Help
+    subterms = metaCommand "#s" "ubterms" $> Subterms
+    redexes = metaCommand "#r" "edexes" $> Redexes
+    fv = keyword "#fv" $> FV
+    autoreduc = keyword "#ar" $> AutoReduc
+    manualreduc = keyword "#mr" $> ManReduc
     lambda =
       subterms
         <|> redexes

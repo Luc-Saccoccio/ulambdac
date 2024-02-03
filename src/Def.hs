@@ -30,6 +30,7 @@ data Command
   | None LambdaTree
   | Reload
   | Quit
+  | Help
   | Load [FilePath]
   | Edit FilePath
 

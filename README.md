@@ -29,7 +29,7 @@ This implementation follows Barendregt's convention, that is :
 ## TODO
 
 - [x] Subterms
-- [ ] Free Variables
+- [x] Free Variables
 - [ ] Redexes
 - [ ] Substitution
 - [ ] β-reduction
