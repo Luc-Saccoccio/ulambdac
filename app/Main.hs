@@ -18,7 +18,7 @@ eval b s = case parseCommand "repl" s of
     Subterms  l -> putStr $ showSubterms (subterms l)
     Redexes   l -> putStrLn $ "Redexes " ++ prettyShow b l
     FV        l -> putStrLn $ '\t' : showFreeVariables (freeVariables l)
-    AutoReduc l -> putStrLn $ "AutoReduc " ++ prettyShow b l
+    AutoReduc l -> putStrLn $ "AutoReduc " ++ prettyShow b (autoreduc l)
     ManReduc  l -> putStrLn $ "ManReduc " ++ prettyShow b l
     None      l -> putStrLn $ prettyShow b l
     Load      f -> putStrLn $ "Load " ++ show f

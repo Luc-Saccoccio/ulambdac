@@ -33,6 +33,7 @@ data Command
   | Help
   | Load [FilePath]
   | Edit FilePath
+  | Delete Char
 
 prettyShow :: Bool -> LambdaTree -> String
 prettyShow explicit = if explicit then prettyE else pretty

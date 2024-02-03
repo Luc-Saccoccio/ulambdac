@@ -47,7 +47,7 @@ application = term >>= rest
         <|> return x
 
 term :: Parser LambdaTree
-term = alias <|> lambdaAbs <|> var <|> between (char '(') (char ')') application
+term = lambdaAbs <|> try alias <|> var <|> between (char '(') (char ')') application
 
 filepath :: Parser FilePath
 filepath = undefined
@@ -60,11 +60,12 @@ command :: Parser Command
 command =
   (eof $> Quit) <|> ((load <|> edit <|> reload <|> quit <|> help) <|> (lambda <*> (skipMany spaceChar *> expression))) <* eof
   where
-    load = metaCommand ":l" "oad" *> some filepath <&> Load
     edit = metaCommand ":e" "dit" *> filepath <&> Edit
-    reload = metaCommand ":r" "eload" $> Reload
-    quit = metaCommand ":q" "uit" $> Quit
+    delete = metaCommand ":d" "elete" *> aliasIdentifier <&> Delete
     help = metaCommand ":h" "elp" $> Help
+    load = metaCommand ":l" "oad" *> some filepath <&> Load
+    quit = metaCommand ":q" "uit" $> Quit
+    reload = metaCommand ":r" "eload" $> Reload
     subterms = metaCommand "#s" "ubterms" $> Subterms
     redexes = metaCommand "#r" "edexes" $> Redexes
     fv = keyword "#fv" $> FV

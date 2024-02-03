@@ -18,6 +18,8 @@ VARIABLEIDENTIFIER ::= _any single lower case letter_
 
 ## Usage notes
 
+## Barendregt's convention
+
 This implementation follows Barendregt's convention, that is :
 
 > "We choose the names for the binding variables in a λ-term in such a
@@ -25,6 +27,26 @@ This implementation follows Barendregt's convention, that is :
 > from all free variables occurring in the term."
 
 [1]
+
+
+## Aliases
+
+The alias `M := f` is defined as semantically equivalent to `(λx.x)` with the added effect of defining `M` to be equal to `f` in the current application :
+
+```
+(M := (λx.xx))(MM)
+=> (λx.xx)(λx.xx)
+```
+
+If used in the global context (i.e. not as an application), it'll be added to the global context of the REPL :
+
+```
+M := (λx.xx)
+MM
+=> (λx.xx)(λx.xx)
+```
+
+It is possible to list bindings with `:b` and delete one with `:d M` or `:delete M` where `M` is an alias identifier. Deleting a non-existing identifier has no effect on the global context.
 
 ## TODO
 
