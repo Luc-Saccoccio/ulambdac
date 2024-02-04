@@ -1,14 +1,10 @@
 {-# LANGUAGE TupleSections #-}
-module Eval (subterms, showSubterms, freeVariables, showFreeVariables, autoreduc) where
+module Eval (subterms, showSubterms, freeVariables, showFreeVariables, autoreduc, showBindings) where
 
 import Def
 import qualified Data.HashSet as HS
 import Data.HashMap.Strict
 import Data.Maybe (isJust, fromMaybe)
-
-type LambdHashTree = HashMap Identifier LambdaTree
-type IdentifierSet = HS.HashSet Identifier
-type LambdHashSet = HS.HashSet LambdaTree
 
 subterms :: LambdaTree -> LambdHashSet
 subterms t =
@@ -30,23 +26,25 @@ showFreeVariables :: IdentifierSet -> String
 showFreeVariables = unwords . fmap (:[]) . HS.toList
 
 showSubterms :: LambdHashSet -> String
-showSubterms = unlines . fmap (('\t':) . prettyShow False) . HS.toList
+showSubterms = unlines . fmap (('\t':) . prettyShow) . HS.toList
+
+showBindings :: LambdHashTree -> String
+showBindings = unlines . foldrWithKey' f []
+  where
+    f :: Identifier -> LambdaTree -> [String] -> [String]
+    f k v = (('\t':k:' ':':':'=':' ':prettyShow v):) -- "k := v"
 
 whileMaybe :: (a -> Maybe a) -> a -> a
-whileMaybe f x =
-  case f x of
-    Nothing -> x
-    Just x' -> whileMaybe f x'
+whileMaybe f x = maybe x (whileMaybe f) (f x)
 
-autoreduc :: LambdaTree -> LambdaTree
-autoreduc = whileMaybe (autoreduc' empty)
+autoreduc :: LambdHashTree -> LambdaTree -> LambdaTree
+autoreduc = whileMaybe . autoreduc'
 
 autoreduc' :: LambdHashTree -> LambdaTree -> Maybe LambdaTree
 autoreduc' lht (Variable c) = lht !? c
 autoreduc' _ (Alias _ _) = Just (Lambda '?' $ Variable '?') -- TODO
 autoreduc' lht (App f g) =
   case f of
-    Variable c -> (autoreduc' lht . (`App` g)) =<< (lht !? c)
     Alias c t -> pure $ whileMaybe (autoreduc' (insert c t lht)) g
     Lambda x fx -> autoreduc' (insert x g lht) fx
     app ->

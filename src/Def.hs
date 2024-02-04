@@ -1,6 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Def
   ( LambdaTree(..)
+  , LambdHashTree
+  , IdentifierSet
+  , LambdHashSet
   , Command(..)
   , Identifier
   , prettyShow
@@ -8,6 +11,8 @@ module Def
 where
 
 import Data.Hashable
+import Data.HashMap.Strict (HashMap)
+import Data.HashSet (HashSet)
 import GHC.Generics (Generic)
 
 type Identifier = Char
@@ -17,7 +22,7 @@ data LambdaTree
   | Lambda Identifier LambdaTree
   | Variable Identifier
   | Alias Identifier LambdaTree
-  deriving (Eq, Generic)
+  deriving (Show, Eq, Generic)
 
 instance Hashable LambdaTree
 
@@ -28,32 +33,22 @@ data Command
   | AutoReduc LambdaTree
   | ManReduc LambdaTree
   | None LambdaTree
-  | Reload
+  | Bindings
   | Quit
   | Help
-  | Load [FilePath]
-  | Edit FilePath
   | Delete Char
 
-prettyShow :: Bool -> LambdaTree -> String
-prettyShow explicit = if explicit then prettyE else pretty
-  where
-    prettyE :: LambdaTree -> String
-    prettyE (Variable v) = [v]
-    prettyE (Lambda x b@(App _ _)) = 'λ' : x : '.' : '(' : prettyE b ++ ")"
-    prettyE (Lambda x b) = 'λ' : x : '.' : prettyE b
-    prettyE (App f@(Lambda _ _) (Variable v)) = '(' : prettyE f ++ [')', v]
-    prettyE (App f@(Lambda _ _) a) = '(' : prettyE f ++ ") (" ++ prettyE a ++ ")"
-    prettyE (App (Variable v) (Variable w)) = ['(', v, w, ')']
-    prettyE (App (Variable v) a) = v : '(' : prettyE a ++ ")"
-    prettyE (App f a) = '(' : prettyE f ++ prettyE a ++ ")"
-    prettyE (Alias x m) = '(' : x : " := " ++ prettyE m ++ ")"
-    pretty :: LambdaTree -> String
-    pretty (Variable v) = [v]
-    pretty (Lambda x b) = 'λ' : x : '.' : pretty b
-    pretty (App f@(Lambda _ _) (Variable v)) = '(' : pretty f ++ [')', v]
-    pretty (App f@(Lambda _ _) a) = '(' : pretty f ++ ") (" ++ pretty a ++ ")"
-    pretty (App (Variable v) (Variable w)) = [v, w]
-    pretty (App f a@(App _ _)) = pretty f ++ "(" ++ pretty a ++ ")"
-    pretty (App f a) = pretty f ++ pretty a
-    pretty (Alias x m) = x : " := " ++ pretty m
+type LambdHashTree = HashMap Identifier LambdaTree
+type IdentifierSet = HashSet Identifier
+type LambdHashSet = HashSet LambdaTree
+
+prettyShow :: LambdaTree -> String
+prettyShow (Variable v) = [v]
+prettyShow (Lambda x b@(App _ _)) = 'λ' : x : '.' : '(' : prettyShow b ++ ")"
+prettyShow (Lambda x b) = 'λ' : x : '.' : prettyShow b
+prettyShow (App f@(Lambda _ _) (Variable v)) = '(' : prettyShow f ++ [')', v]
+prettyShow (App f@(Lambda _ _) a) = '(' : prettyShow f ++ ") (" ++ prettyShow a ++ ")"
+prettyShow (App (Variable v) (Variable w)) = ['(', v, w, ')']
+prettyShow (App (Variable v) a) = v : '(' : prettyShow a ++ ")"
+prettyShow (App f a) = '(' : prettyShow f ++ prettyShow a ++ ")"
+prettyShow (Alias x m) = '(' : x : " := " ++ prettyShow m ++ ")"

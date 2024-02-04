@@ -23,7 +23,7 @@ varIdentifier :: Parser Identifier
 varIdentifier = lexeme lowerChar
 
 aliasIdentifier :: Parser Identifier
-aliasIdentifier = lexeme upperChar
+aliasIdentifier = lexeme (upperChar <|> digitChar)
 
 lambdaAbs :: Parser LambdaTree
 lambdaAbs = flip (foldr Lambda) <$> (lexeme (oneOf ['\\', 'λ']) *> some varIdentifier <* symbol '.') <*> application
@@ -49,23 +49,18 @@ application = term >>= rest
 term :: Parser LambdaTree
 term = lambdaAbs <|> try alias <|> var <|> between (char '(') (char ')') application
 
-filepath :: Parser FilePath
-filepath = undefined
-
 metaCommand :: String -> String -> Parser ()
 metaCommand start end = string start *> optional (string end) *> space
 
 -- The parser for command feels very clumsy
 command :: Parser Command
 command =
-  (eof $> Quit) <|> ((load <|> edit <|> reload <|> quit <|> help) <|> (lambda <*> (skipMany spaceChar *> expression))) <* eof
+  (eof $> Quit) <|> ((delete <|> bindings <|> quit <|> help) <|> (lambda <*> (skipMany spaceChar *> expression))) <* eof
   where
-    edit = metaCommand ":e" "dit" *> filepath <&> Edit
     delete = metaCommand ":d" "elete" *> aliasIdentifier <&> Delete
     help = metaCommand ":h" "elp" $> Help
-    load = metaCommand ":l" "oad" *> some filepath <&> Load
     quit = metaCommand ":q" "uit" $> Quit
-    reload = metaCommand ":r" "eload" $> Reload
+    bindings = metaCommand ":b" "indings" $> Bindings
     subterms = metaCommand "#s" "ubterms" $> Subterms
     redexes = metaCommand "#r" "edexes" $> Redexes
     fv = keyword "#fv" $> FV

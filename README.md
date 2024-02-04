@@ -12,7 +12,7 @@ lambdaAbs ::= ('\' | 'λ') VARIABLEIDENTIFIER '.' application
 var ::= ALIASIDENTIFIER | VARIABLEIDENTIFIER
 application ::= term term+
 
-ALIASIDENTIFIER ::= _any single upper case letter_
+ALIASIDENTIFIER ::= _any single upper case letter_ | _any single digit_
 VARIABLEIDENTIFIER ::= _any single lower case letter_
 ```
 
@@ -52,12 +52,11 @@ It is possible to list bindings with `:b` and delete one with `:d M` or `:delete
 
 - [x] Subterms
 - [x] Free Variables
-- [ ] Redexes
-- [ ] Substitution
-- [ ] β-reduction
+- [x] Substitution (through aliases)
 - [ ] Automatic reduction
+- [ ] Redexes
 - [ ] Manual reduction
-- [ ] REPL history
+- [x] REPL history
 
 ## References
 
