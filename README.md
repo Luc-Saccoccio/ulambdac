@@ -1,6 +1,6 @@
 # ULambdaC
 
-The Untyped Lambda Calculus REPL (Acronym In Progress)
+The Untyped Lambda Calculus REPL
 
 ## Grammar
 
@@ -18,7 +18,7 @@ VARIABLEIDENTIFIER ::= _any single lower case letter_
 
 ## Usage notes
 
-## Barendregt's convention
+### Barendregt's convention
 
 This implementation follows Barendregt's convention, that is :
 
@@ -28,8 +28,11 @@ This implementation follows Barendregt's convention, that is :
 
 [1]
 
+### Auto-reduction
 
-## Aliases
+Auto-reduction has no failsafe for checking programs that are not reducible to normal form. Plus, the strategy used is _probably_ applicative order (unsure because this is a toy program and I don't know what I'm doing anyway). The [Church-Rosser theorem](https://en.wikipedia.org/wiki/Church%E2%80%93Rosser_theorem) assures that we obtain what we want anyway :D
+
+### Aliases
 
 The alias `M := f` is defined as semantically equivalent to `(λx.x)` with the added effect of defining `M` to be equal to `f` in the current application :
 
@@ -48,12 +51,27 @@ MM
 
 It is possible to list bindings with `:b` and delete one with `:d M` or `:delete M` where `M` is an alias identifier. Deleting a non-existing identifier has no effect on the global context.
 
+### Recursion and mutual recursion
+
+Since aliases are stored syntactically, they do not reference the currently stored aliases. Concretely :
+```
+λ> M := Iy
+λ> I := λx.x
+λ> #ar M
+y
+λ> I := \x.xx
+λ> #ar M
+yy
+```
+
+This has the (totally planned) effect of allowing recursion and mutual recursion between lambda terms :D !
+
 ## TODO
 
 - [x] Subterms
 - [x] Free Variables
 - [x] Substitution (through aliases)
-- [ ] Automatic reduction
+- [x] Automatic reduction
 - [ ] Redexes
 - [ ] Manual reduction
 - [x] REPL history

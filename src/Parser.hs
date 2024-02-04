@@ -57,6 +57,7 @@ command :: Parser Command
 command =
   (eof $> Quit) <|> ((delete <|> bindings <|> quit <|> help) <|> (lambda <*> (skipMany spaceChar *> expression))) <* eof
   where
+    debugPrint = metaCommand "#d" "ebug" $> DebugPrint
     delete = metaCommand ":d" "elete" *> aliasIdentifier <&> Delete
     help = metaCommand ":h" "elp" $> Help
     quit = metaCommand ":q" "uit" $> Quit
@@ -68,6 +69,7 @@ command =
     manualreduc = keyword "#mr" $> ManReduc
     lambda =
       subterms
+        <|> debugPrint
         <|> redexes
         <|> fv
         <|> autoreduc

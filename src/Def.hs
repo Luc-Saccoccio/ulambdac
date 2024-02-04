@@ -29,6 +29,7 @@ instance Hashable LambdaTree
 data Command
   = Subterms LambdaTree
   | Redexes LambdaTree
+  | DebugPrint LambdaTree
   | FV LambdaTree
   | AutoReduc LambdaTree
   | ManReduc LambdaTree

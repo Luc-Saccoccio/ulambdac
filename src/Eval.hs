@@ -37,20 +37,22 @@ showBindings = unlines . foldrWithKey' f []
 whileMaybe :: (a -> Maybe a) -> a -> a
 whileMaybe f x = maybe x (whileMaybe f) (f x)
 
+-- For debugs purposes :
+-- whileMaybe . (traceWith (maybe "Nothing" prettyShow) .) . autoreduc'
 autoreduc :: LambdHashTree -> LambdaTree -> LambdaTree
 autoreduc = whileMaybe . autoreduc'
 
 autoreduc' :: LambdHashTree -> LambdaTree -> Maybe LambdaTree
 autoreduc' lht (Variable c) = lht !? c
-autoreduc' _ (Alias _ _) = Just (Lambda '?' $ Variable '?') -- TODO
+autoreduc' _ (Alias _ _) = Just (Lambda '?' $ Variable '?')
 autoreduc' lht (App f g) =
   case f of
     Alias c t -> pure $ whileMaybe (autoreduc' (insert c t lht)) g
-    Lambda x fx -> autoreduc' (insert x g lht) fx
+    Lambda x fx -> pure . fromMaybe fx $ autoreduc' (insert x g lht) fx
     app ->
       let f' = autoreduc' lht app
           g' = autoreduc' lht g
        in if any isJust [f', g']
-             then autoreduc' lht (App (fromMaybe f f') (fromMaybe g g'))
+             then Just (App (fromMaybe f f') (fromMaybe g g'))
              else Nothing
-autoreduc' lht (Lambda x f) = Lambda x <$> autoreduc' lht f
+autoreduc' lht (Lambda x f) = Lambda x <$> autoreduc' (delete x lht) f

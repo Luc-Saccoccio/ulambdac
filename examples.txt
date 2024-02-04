@@ -1,0 +1,47 @@
+-- Church Numerals
+0 := \f.\x.x
+S := \n.\f.\x.f(nfx)
+1 := S0
+2 := S1
+3 := S2
+4 := S3
+5 := S4
+6 := S5
+7 := S6
+8 := S7
+9 := S8
+
+-- Addition
+P := \m.\n.\f.\x.mf(nfx)
+P := \m.\n.mSn
+
+-- Multiplication
+M := \m.\n.\f.m(nf)
+M := \m.\n.m(Pn)0
+
+-- Exponentiation
+E := \b.\e.eb
+
+-- Pred
+R := \n.\f.\x.n(\g.\h.h(gf))(\u.x)(\u.u)
+
+-- Substraction
+S := \m.\n.nRm
+
+-- Logic
+T := \x.\y.x
+F := \x.\y.y
+
+A := \p.\q.pqp
+O := \p.\q.ppq
+N := \p.pFT
+-- If Then Else => Cond
+C := \p.\a.\b.pab
+
+-- Is Zero
+Z := \n.n(\x.F)T
+
+R := \n.n(\g.\k.Z(g1)k(P(gk)1)(\v.0)0
+
+-- Less than or equal
+L := \m.\n.Z(Smn)

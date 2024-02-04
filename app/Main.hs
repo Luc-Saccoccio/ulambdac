@@ -19,6 +19,7 @@ historyLocation :: IO FilePath
 historyLocation = maybe ((++ "/.cache/ulambdac_history") <$> getEnv "HOME") (pure . (++ "/ulambdac_history")) =<< lookupEnv "XDG_CACHE_HOME"
 
 evalCommand :: IORef LambdHashTree -> Command -> IO ()
+evalCommand lht (DebugPrint l) = print l
 evalCommand lht (AutoReduc l) = do
   lht' <- readIORef lht
   putStrLn $ "AutoReduc " ++ prettyShow (autoreduc lht' l)
